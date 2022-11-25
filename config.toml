@@ -37,8 +37,8 @@ author = "Ethan Smith"
 # Put all your custom variables here
 menu_items = [
     {url= "$BASE_URL", name = "Home"},
-    {href = "$BASE_URL/about/me", name = "About"},
-    {href = "$BASE_URL/about/contact", name = "Contact"},
-    {href = "https://github.com/ethanhs", name = "Github", newtab = true},
-    {href = "https://hachyderm.io/@ethantyping", name = "Mastodon", newtab = true},
+    {url = "$BASE_URL/about/me", name = "About"},
+    {url = "$BASE_URL/about/contact", name = "Contact"},
+    {url = "https://github.com/ethanhs", name = "Github", newtab = true},
+    {url = "https://hachyderm.io/@ethantyping", name = "Mastodon", newtab = true},
 ]
