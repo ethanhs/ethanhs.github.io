@@ -8,4 +8,4 @@ I started learning to program when I was in high school, when I taught myself Py
 
 In my open source work, I am a core developer on the mypy project, and a contributor to CPython, focusing on porting Python to the web.
 
-	I currently work on the open source team at [Sentry](https://sentry.io), a really cool error/performance monitoring software. In my free time I like to work on the above mentioned open source projects and play Minecraft.
+I currently work on the open source team at [Sentry](https://sentry.io), a really cool error/performance monitoring software. In my free time I like to work on the above mentioned open source projects and play Minecraft.
