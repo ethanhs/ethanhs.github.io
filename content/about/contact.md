@@ -12,7 +12,7 @@ If you prefer email, you can contact me at the address below:
 
 ## mastodon
 
-I am [@ethantyping@hachyderm.io](https://hachyderm.io/@ethantyping). I check Mastodon daily, so this is a good place to reach me, if nothing else works.
+I am <a rel="me" href="https://hachyderm.io/@ethantyping">@ethantyping@hachyderm.io</a>. I check Mastodon daily, so this is a good place to reach me, if nothing else works.
 
 ## gitter.im
 
