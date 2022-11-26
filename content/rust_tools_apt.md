@@ -4,7 +4,7 @@ date = 2022-11-26
 +++
 
 > tl;dr
-> Go to http://apt.cli.rs and follow the instructions to add the apt repo
+> Go to [http://apt.cli.rs](http://apt.cli.rs) and follow the instructions to add the apt repo
 
 I guess its only fair to start my new blogging kick by catching up on a project I'd worked on several months ago which is pretty much "done." I really like several Rust tools, such as [`ripgrep`](https://github.com/BurntSushi/ripgrep), [`hyperfine`](https://github.com/sharkdp/hyperfine), and [`fd`](https://github.com/sharkdp/fd). I wanted an easy way to install them on Debian-based systems that may not have them in the official repos, so I needed to create my own apt repo. I was originally considering making a ppa, or private package archive, since I mainly use Ubuntu, but I decided I wanted these tools available on Debian as well, so my only option was an apt repo.
 
@@ -18,7 +18,7 @@ When setting up the repo, my criteria for inclusion were:
 
 With these criteria in hand, I then set up the apt repo with the CLI tools that fit and wrote a script to try updating all of the packages, pulling from the official Github releases. I have subscribed to releases on Github from all the repos that are currently included in the apt repo so all I have to do is run the script when a new release comes out from one of the repos. I may end up setting up a cronjob that runs this update script, but I'm weighing whether it is worth any potential risks...
 
-Anyway, if you are interested in using this apt repo, head on over to https://apt.cli.rs, I've written up the commands you need to get started using the apt repo.
+Anyway, if you are interested in using this apt repo, head on over to [https://apt.cli.rs](http://apt.cli.rs), I've written up the commands you need to get started using the apt repo.
 
 If you have suggestions for Rust CLI tools that should be included, please [open an issue on the github](https://github.com/ethanhs/apt.cli.rs/issues/new)! If a package doesn't build musl-linked Debian packages, consider opening an issue on that project to add it. However, please *do not* spam maintainers asking for these packages to be built. I unfortunately do not have time to contribute to the packaging of every great Rust CLI tool, but I can add them to the apt repo if they are packaged already!
 
