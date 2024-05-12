@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Ethan Typing</title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="robots" content="noodp"/>
+
+    <link rel="stylesheet" href="https://ethanhs.me/style.css">
+    <link rel="stylesheet" href="https://ethanhs.me/color/blue.css">
+
+        <link rel="stylesheet" href="https://ethanhs.me/color/background_dark.css">
+    
+    <link rel="stylesheet" href="https://ethanhs.me/font-hack-subset.css">
+
+    <link rel="me" href="https://hachyderm.io/@ethantyping">
+</head>
+
+<body class="">
+<div class="container">
+    
+    <header class="header">
+        <div class="header__inner">
+            <div class="header__logo">
+                    
+                <a href="https://ethanhs.me" style="text-decoration: none;">
+                    <div class="logo">
+                      
+                            Ethan&#x27;s Blog
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        
+        
+                <nav class="menu">
+            <ul class="menu__inner">
+                <li class="active"><a href="https://ethanhs.me">Home</a></li>
+            
+                <li><a href="https://ethanhs.me/about/me">About</a></li>
+            
+                <li><a href="https://ethanhs.me/about/contact">Contact</a></li>
+            
+                <li><a href="https://github.com/ethanhs" target="_blank" rel="noopener noreferrer">Github</a></li>
+            
+                <li><a href="https://hachyderm.io/@ethantyping" target="_blank" rel="noopener noreferrer">Mastodon</a></li>
+            </ul>
+        </nav>
+    
+    
+        
+    </header>
+    
+
+    <div class="content">
+        
+    <div class="post">
+        
+    <h1 class="post-title"><a href="https://ethanhs.me/generational-arena-dom/">New Rust crate: generational-arena-dom</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2023-07-08
+        </span>
+
+    </div>
+
+    
+
+        
+        <div class="post-content">
+            <p>I've just published a new crate someone may find interesting. I recently had a take-home assessment where I used the <a href="https://servo.org/">Servo project's</a> <code>html5ever</code> HTML parser crate. <a href="https://github.com/servo/html5ever"><code>html5ever</code></a> is the main crate that servo uses to parse HTML content on the web. This crate is very customizable, and you have to bring your own implementation of the DOM (which means you can handle memory management however you want!). They provide an example implementation of the DOM that uses <code>Rc&lt;RefCell&lt;T&gt;&gt;</code>s all over, which is a bit annoying to use with Rust's borrow checking model. This becomes particularly frustrating when dealing with frequent DOM mutations, as was the case in my project.</p>
+<p>Fortunately, I recalled the benefits of using arenas for ergonomic memory management when working with trees. I also had recently read about <a href="https://verdagon.dev/blog/hybrid-generational-memory">Vale's generational arena usage</a>, and I was inspired to build a DOM implementation based on a generational arena design. Generational arenas are nice because they don't suffer from <a href="https://en.wikipedia.org/wiki/ABA_problem">the ABA problem</a>, so it is thread-safe to add, update, and delete nodes in the DOM. I ended up coming across the <a href="https://crates.io/crates/generational-indextree">generational-indextree</a> crate, which uses tokens instead of references to refer to tree members, which made working with mutable elements of the DOM much easier!</p>
+<p>Anyway, I encourage anyone who is interested to learn more to check out the project <a href="https://github.com/ethanhs/generational-arena-dom">on my github</a> or <a href="https://crates.io/crates/generational-arena-dom">on the project page on crates.io</a></p>
+
+        </div>
+
+        
+        <div class="pagination">
+            <div class="pagination__title">
+                <span class="pagination__title-h">Thanks for reading! Read other posts?</span>
+                <hr />
+            </div>
+            <div class="pagination__buttons">
+                    <span class="button previous">
+                        <a href="https://ethanhs.me/concurrent-sqlite/">
+                            <span class="button__icon">←</span>&nbsp;
+                            <span class="button__text">Using multiprocessing and sqlite3 together</span>
+                        </a>
+                    </span>
+                
+                </div>
+        </div>
+    
+    </div>
+
+    </div>
+
+    
+    <footer class="footer">
+        <div class="footer__inner">
+                <div class="copyright">
+                        <span>© 
+    2024
+ Ethan Smith</span>
+                    <span class="copyright-theme">
+                        <span class="copyright-theme-sep">:: </span>
+                        Theme: <a href="https://github.com/pawroman/zola-theme-terminimal/">Terminimal</a> by pawroman
+                    </span>
+                </div>
+            </div>
+    </footer>
+    
+
+</div>
+</body>
+
+</html>

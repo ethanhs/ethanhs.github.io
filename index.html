@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Ethan Typing</title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="robots" content="noodp"/>
+
+    <link rel="stylesheet" href="https://ethanhs.me/style.css">
+    <link rel="stylesheet" href="https://ethanhs.me/color/blue.css">
+
+        <link rel="stylesheet" href="https://ethanhs.me/color/background_dark.css">
+    
+    <link rel="stylesheet" href="https://ethanhs.me/font-hack-subset.css">
+
+    <link rel="me" href="https://hachyderm.io/@ethantyping">
+</head>
+
+<body class="">
+<div class="container">
+    
+    <header class="header">
+        <div class="header__inner">
+            <div class="header__logo">
+                    
+                <a href="https://ethanhs.me" style="text-decoration: none;">
+                    <div class="logo">
+                      
+                            Ethan&#x27;s Blog
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        
+        
+                <nav class="menu">
+            <ul class="menu__inner">
+                <li class="active"><a href="https://ethanhs.me">Home</a></li>
+            
+                <li><a href="https://ethanhs.me/about/me">About</a></li>
+            
+                <li><a href="https://ethanhs.me/about/contact">Contact</a></li>
+            
+                <li><a href="https://github.com/ethanhs" target="_blank" rel="noopener noreferrer">Github</a></li>
+            
+                <li><a href="https://hachyderm.io/@ethantyping" target="_blank" rel="noopener noreferrer">Mastodon</a></li>
+            </ul>
+        </nav>
+    
+    
+        
+    </header>
+    
+
+    <div class="content">
+        
+        <div class="posts">
+                <div class="post on-list">
+                    
+    <h1 class="post-title"><a href="https://ethanhs.me/generational-arena-dom/">New Rust crate: generational-arena-dom</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2023-07-08
+        </span>
+
+    </div>
+
+    
+
+                    
+        <div class="post-content">
+            <p>I've just published a new crate someone may find interesting. I recently had a take-home assessment where I used the <a href="https://servo.org/">Servo project's</a> <code>html5ever</code> HTML parser crate. <a href="https://github.com/servo/html5ever"><code>html5ever</code></a> is the main crate that servo uses to parse HTML content on the web. This crate is very customizable, and you have to bring your own implementation of the DOM (which means you can handle memory management however you want!). They provide an example implementation of the DOM that uses <code>Rc&lt;RefCell&lt;T&gt;&gt;</code>s all over, which is a bit annoying to use with Rust's borrow checking model. This becomes particularly frustrating when dealing with frequent DOM mutations, as was the case in my project.</p>
+<p>Fortunately, I recalled the benefits of using arenas for ergonomic memory management when working with trees. I also had recently read about <a href="https://verdagon.dev/blog/hybrid-generational-memory">Vale's generational arena usage</a>, and I was inspired to build a DOM implementation based on a generational arena design. Generational arenas are nice because they don't suffer from <a href="https://en.wikipedia.org/wiki/ABA_problem">the ABA problem</a>, so it is thread-safe to add, update, and delete nodes in the DOM. I ended up coming across the <a href="https://crates.io/crates/generational-indextree">generational-indextree</a> crate, which uses tokens instead of references to refer to tree members, which made working with mutable elements of the DOM much easier!</p>
+<p>Anyway, I encourage anyone who is interested to learn more to check out the project <a href="https://github.com/ethanhs/generational-arena-dom">on my github</a> or <a href="https://crates.io/crates/generational-arena-dom">on the project page on crates.io</a></p>
+
+        </div>
+
+                </div>
+            
+                <div class="post on-list">
+                    
+    <h1 class="post-title"><a href="https://ethanhs.me/concurrent-sqlite/">Using multiprocessing and sqlite3 together</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2023-05-19
+        </span>
+
+    </div>
+
+    
+
+                    
+        <div class="post-content">
+            <blockquote>
+<p>Note from the author: this is a pseudo TIL, but I hadn't seen it written down anywhere, hopefully someone finds it useful!
+Jump to &quot;Solution&quot; below if you don't care about the background.</p>
+</blockquote>
+<h1 id="background">Background</h1>
+<h3 id="generating-data">Generating Data</h3>
+<p>I recently started working on a reinforcement learning project, and I needed to generate a lot of training data. The project involves quantum compilers, so the data I generate is quantum circuits. For those unfamiliar, quantum circuits are just sequences of unitary matrices laid out in a particular order. I chose to store the circuit as a sequence of unitary gate names. The output of the data generation is the unitaries (numpy arrays) that are the result of multiplying the matrices in the circuit together.</p>
+<p>I ended up wanting to generate somewhere in the region of a few hundred billion matrices, each of them very small. I knew off the bat that this would require a fair bit of time, and I wanted to take advantage of the 32 core server I own. Since I was using Python to generate this data, I used the multiprocessing module. Sadly I cannot yet take advantage of <a href="https://martinheinz.dev/blog/97">Python multithreading coming in 3.12</a>.</p>
+<h3 id="disk-space-woes">Disk Space Woes</h3>
+<p>For saving the generated matrices, I started off by doing the simplest thing, just using plain-old <code>np.savetxt</code> to save the (pretty tiny) matrices to disk in each process after computing the product of the matrices in the quantum circuit. This... was problematic. I quickly ran into a disk out of space error. Normally this means I need to clear out space on whatever VM I am using, but there was one problem -- I still had hundreds of gigabytes of space left on disk! </p>
+<p>I quickly deduced the error actually was caused by hitting the limit on entries in a directory, dang it <a href="https://cifs.com/">CIFS</a>! I briefly tried to make my own schema to split the unitaries into more directories to avoid this limit but I ended up hitting more file system limits. It was clear just writing files to disk wouldn't scale to the size of dataset I needed to generate.</p>
+<h3 id="choosing-a-database">Choosing a Database</h3>
+<p>Of course, dealing with so many small files, a database was the right solution to this problem. Why didn't I start with a database to begin with? Partially because I wanted to make it easy to load individual unitaries (<code>np.loadtxt</code> is an incredibly handy API). Also, I was just hacking this data generation script together.</p>
+<p>I had one issue with switching to a database: I wanted something simple and lightweight, I didn't need anything fancy like postgres or the like. Sqlite is the obvious choice but sqlite does not by default support concurrent <em>writes</em>, which is exactly what I wanted to do!</p>
+<h1 id="solution">Solution</h1>
+<p>So how can one achieve concurrent writes in Python using sqlite3? Sqlite by default uses a rollback log to maintain consistency. You can change the configuration so that sqlite uses <a href="https://www.sqlite.org/wal.html">a <em>write-ahead</em> log (WAL) mode</a> as well, which allows for concurrent writes. You can enable WAL mode in Python by setting the <a href="https://www.sqlite.org/pragma.html#pragma_journal_mode">journal mode</a>:</p>
+<pre data-lang="python3" style="background-color:#1e1e1e;color:#dcdcdc;" class="language-python3 "><code class="language-python3" data-lang="python3"><span># assume some Cursor object `cursor`
+</span><span>cursor.execute(&#39;PRAGMA journal_mode = WAL&#39;)
+</span></code></pre>
+<p>However, I started getting exceptions part way through. Some processes calculating the unitaries were being told the database was locked, even though it should not be (these processes should be writing to the WAL, which I want to always be available). Therefore I also set <a href="https://www.sqlite.org/pragma.html#pragma_synchronous">the sqlite pragma <code>synchronous</code></a> to <code>OFF</code>, which means that the WAL does not synchronize before checkpoints. Note this is <strong>dangerous</strong> because theoretically your database could become corrupted if the process crashes or the server shuts down. This is acceptable to me because I can always regenerate the database and either of these are very unlikely to occur while I run these data generation tasks. This can be done in Python like so:</p>
+<pre data-lang="python3" style="background-color:#1e1e1e;color:#dcdcdc;" class="language-python3 "><code class="language-python3" data-lang="python3"><span># assume some Cursor object `cursor`
+</span><span>cursor.execute(&#39;PRAGMA synchronous = OFF&#39;)
+</span></code></pre>
+<p>In summary, by enabling the WAL and turning some sync'ing off, I was able to get multi-processed Python code to concurrently write to a sqlite database. This also gave a nice speed bump since sqlite is optimized for writing many small amounts of data to disk, a nice bonus!</p>
+
+        </div>
+
+                </div>
+            <div class="pagination">
+                <div class="pagination__buttons">
+                    <span class="button next">
+                        <a href="https://ethanhs.me/page/2/">
+                            <span class="button__text">Older posts</span>&nbsp;
+                            <span class="button__icon">→</span>
+                        </a>
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    
+    <footer class="footer">
+        <div class="footer__inner">
+                <div class="copyright">
+                        <span>© 
+    2024
+ Ethan Smith</span>
+                    <span class="copyright-theme">
+                        <span class="copyright-theme-sep">:: </span>
+                        Theme: <a href="https://github.com/pawroman/zola-theme-terminimal/">Terminimal</a> by pawroman
+                    </span>
+                </div>
+            </div>
+    </footer>
+    
+
+</div>
+</body>
+
+</html>
